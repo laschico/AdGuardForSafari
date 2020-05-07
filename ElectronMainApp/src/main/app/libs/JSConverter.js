@@ -1,6 +1,6 @@
 /**
  * AdGuard -> Safari Content Blocker converter
- * Version 4.2.4
+ * Version 4.2.5
  * License: https://github.com/AdguardTeam/SafariContentBlockerConverterCompiler/blob/master/LICENSE
  */
 
@@ -1020,6 +1020,7 @@ var jsonFromFilters = (function () {
             'to',
             'mobi',
             'gov.cn',
+            'sh'
         ];
 
         api.TOP_LEVEL_DOMAINS_LIST = TOP_LEVEL_DOMAINS_LIST;
@@ -1526,9 +1527,9 @@ var jsonFromFilters = (function () {
          */
         function isAbpSnippetRule(rule) {
             return (
-                    rule.indexOf(ABP_SCRIPTLET_MASK) > -1
-                    || rule.indexOf(ABP_SCRIPTLET_EXCEPTION_MASK) > -1
-                ) && rule.search(ADG_CSS_MASK_REG) === -1;
+                rule.indexOf(ABP_SCRIPTLET_MASK) > -1
+                || rule.indexOf(ABP_SCRIPTLET_EXCEPTION_MASK) > -1
+            ) && rule.search(ADG_CSS_MASK_REG) === -1;
         }
 
         /**
@@ -3203,7 +3204,7 @@ var jsonFromFilters = (function () {
         /**
          * Safari content blocking format rules converter.
          */
-        const CONVERTER_VERSION = '4.2.4';
+        const CONVERTER_VERSION = '4.2.5';
         // Max number of CSS selectors per rule (look at compactCssRules function)
         const MAX_SELECTORS_PER_WIDE_RULE = 250;
 
