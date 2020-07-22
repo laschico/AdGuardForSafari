@@ -99,9 +99,9 @@
     const applyAdvancedBlockingData = (data, verbose) => {
         logMessage(verbose, 'Applying scripts and css..');
 
+        applyScriptlets(data.scriptlets, verbose);
         applyScripts(data.scripts, verbose);
         applyExtendedCss(data.css, verbose);
-        applyScriptlets(data.scriptlets, verbose);
 
         logMessage(verbose, 'Applying scripts and css - done');
     };
@@ -137,10 +137,10 @@
 
 
     if (window.top === window) {
-        safari.self.addEventListener("message", handleMessage);
-
         // Request advanced blocking data
         safari.extension.dispatchMessage("getAdvancedBlockingData");
+
+        safari.self.addEventListener("message", handleMessage);
     }
 })();
 
