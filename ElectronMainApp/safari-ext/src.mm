@@ -68,6 +68,15 @@ static void AsyncSendHandler(uv_async_t *handle) {
   uv_close((uv_handle_t *)handle, DeleteAsyncHandle);
 }
 
+static BOOL isSTPDefaultBrowser() {
+    NSURL *defUrl = [NSWorkspace.sharedWorkspace URLForApplicationToOpenURL:[NSURL URLWithString:@"http://domain.com/"]];
+    if (defUrl) {
+        NSBundle *bundle = [NSBundle bundleWithURL:defUrl];
+        return [bundle.bundleIdentifier isEqualToString:@"com.apple.SafariTechnologyPreview"];
+    }
+    return NO;
+}
+
 NAN_METHOD(setWhitelistDomains) {
 
     if (info.Length() < 2) {
@@ -431,7 +440,10 @@ NAN_METHOD(getExtensionContentBlockerState){
             delete cb;
         });
     };
-
+    
+    if (isSTPDefaultBrowser()) {
+        resultBlock(YES);
+    }
     [SFContentBlockerManager getStateOfContentBlockerWithIdentifier:bundleId
     completionHandler:^(SFContentBlockerState * _Nullable state, NSError * _Nullable error) {
         resultBlock(error == nil && state.enabled);
@@ -463,7 +475,10 @@ NAN_METHOD(extensionSafariIconState){
             delete cb;
         });
     };
-
+    
+    if (isSTPDefaultBrowser()) {
+        resultBlock(YES);
+    }
     [SFSafariExtensionManager getStateOfSafariExtensionWithIdentifier:AESharedResources.extensionBundleId
     completionHandler:^(SFSafariExtensionState * _Nullable state, NSError * _Nullable error) {
         resultBlock(error == nil && state.enabled);
@@ -496,6 +511,9 @@ NAN_METHOD(extensionAdvancedBlockingState){
 		});
 	};
 
+    if (isSTPDefaultBrowser()) {
+        resultBlock(YES);
+    }
 	[SFSafariExtensionManager getStateOfSafariExtensionWithIdentifier:AESharedResources.advancedBlockingBundleId
 	completionHandler:^(SFSafariExtensionState * _Nullable state, NSError * _Nullable error) {
 		resultBlock(error == nil && state.enabled);
