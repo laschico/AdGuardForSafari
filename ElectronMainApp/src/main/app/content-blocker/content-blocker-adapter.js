@@ -30,12 +30,17 @@ module.exports = (function () {
 
             for (let group of grouped) {
                 const rulesTexts = group.rules.map(x => x.ruleText);
+                const rulesCount = rulesTexts.length;
                 const bundleId = rulesGroupsBundles[group.key];
 
+                if (!overlimit) {
+                    overlimit = rulesCount > RULES_LIMIT;
+                }
+
                 const info = {
-                    rulesCount: rulesTexts.length,
+                    rulesCount: rulesCount,
                     bundleId: bundleId,
-                    overlimit: false,
+                    overlimit: rulesCount > RULES_LIMIT,
                     filterGroups: group.filterGroups,
                     hasError: false,
                 };
@@ -49,13 +54,14 @@ module.exports = (function () {
                 { rulesCount: rules.length }
             );
 
-            const rulesWithoutComments = rules.filter((rule) => !rule.ruleText.startsWith('!')).length;
+            const rulesWithoutCommentsCount = rules.filter((rule) => !rule.ruleText.startsWith('!')).length;
 
             // TODO: This info is now ready only after content-blocker set
             listeners.notifyListeners(events.CONTENT_BLOCKER_UPDATED, {
-                rulesCount: rulesWithoutComments.length,
-                rulesOverLimit: false, // unknown
-                advancedBlockingRulesCount: rules.length // unknown
+                rulesCount: rulesWithoutCommentsCount,
+                // not really reliable, actually the limit is up on json entries count, but not the source rules
+                rulesOverLimit: overlimit,
+                advancedBlockingRulesCount: rulesWithoutCommentsCount // unknown
             });
 
         });
