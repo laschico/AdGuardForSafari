@@ -78,7 +78,7 @@
                     </div>
                     <div class="settings-notification__control">
                         <button class="button button--orange settings-notification__btn open-safari-extensions-settings-btn"
-                            i18n="settings_notification_extensions_button_text">
+                                i18n="settings_notification_extensions_button_text">
                         </button>
                         <button id="enableExtensionsNotificationClose" class="settings-notification__close"></button>
                     </div>
@@ -178,17 +178,17 @@
                 </ul>
             </div>
             <!--<div class="settings-actions-wr">-->
-                <!--<div class="try-premium">-->
-                    <!--<a href="https://adguard.com/" target="_blank" class="try-premium__in">-->
-                        <!--<span class="try-premium__btn" i18n="options_compare_btn"></span>-->
-                        <!--<span class="try-premium__title" i18n="options_compare_title"></span>-->
-                    <!--</a>-->
-                <!--</div>-->
+            <!--<div class="try-premium">-->
+            <!--<a href="https://adguard.com/" target="_blank" class="try-premium__in">-->
+            <!--<span class="try-premium__btn" i18n="options_compare_btn"></span>-->
+            <!--<span class="try-premium__title" i18n="options_compare_title"></span>-->
+            <!--</a>-->
+            <!--</div>-->
 
-                <!--<div class="settings-actions settings-actions&#45;&#45;in">-->
-                    <!--<a href="/pages/export.html#exs" target="_blank" id="exportSettingsFile" class="button button&#45;&#45;green button&#45;&#45;link" i18n="options_export_settings"></a>-->
-                    <!--<a href="#" id="importSettingsFile" i18n="options_import_settings" class="button button&#45;&#45;green-bd button&#45;&#45;link"></a>-->
-                <!--</div>-->
+            <!--<div class="settings-actions settings-actions&#45;&#45;in">-->
+            <!--<a href="/pages/export.html#exs" target="_blank" id="exportSettingsFile" class="button button&#45;&#45;green button&#45;&#45;link" i18n="options_export_settings"></a>-->
+            <!--<a href="#" id="importSettingsFile" i18n="options_import_settings" class="button button&#45;&#45;green-bd button&#45;&#45;link"></a>-->
+            <!--</div>-->
             <!--</div>-->
             <div class="settings-content__desc" i18n="options_general_desc"></div>
         </div>
@@ -358,13 +358,13 @@
                 </div>
                 <div class="settings-actions settings-actions--saved">
                     <div class="settings-actions__save-button">
-                      <a class="button button--green button--m settings-content__save-btn" href="#" i18n="options_editor_save_button" id="whiteListFilterApplyChanges"></a>
+                        <a class="button button--green button--m settings-content__save-btn" id="whiteListFilterApplyChanges" href="#" i18n="options_editor_save_button"></a>
                     </div>
                     <div class="filter-rules__label" id="whiteListRulesSaveIndicator"></div>
                     <div class="filter-rules__import-export">
-                        <input accept=".txt, text/plain" id="importAllowlistInput" style="display: none;" type="file"/>
-                        <a class="button button--green button--link" href="#" i18n="options_userfilter_import" id="allowlistImport"></a>
-                        <a class="button button--green-bd button--link disabled" href="#" i18n="options_userfilter_export" id="allowlistExport"></a>
+                        <input type="file" id="importAllowlistInput" style="display: none;" accept=".txt, text/plain"/>
+                        <a id="allowlistImport" href="#" i18n="options_userfilter_import" class="button button--green button--link"></a>
+                        <a id="allowlistExport" href="#" i18n="options_userfilter_export" class="button button--green-bd button--link disabled"></a>
                     </div>
                 </div>
             </div>
@@ -381,13 +381,13 @@
                 </div>
                 <div class="settings-actions settings-actions--saved">
                     <div class="settings-actions__save-button">
-                        <a class="button button--green button--m settings-content__save-btn" href="#" i18n="options_editor_save_button" id="userFilterApplyChanges"></a>
+                        <a class="button button--green button--m settings-content__save-btn" id="userFilterApplyChanges" href="#" i18n="options_editor_save_button"></a>
                     </div>
                     <div class="filter-rules__label" id="userRulesSaveIndicator"></div>
                     <div class="filter-rules__import-export">
-                        <input accept=".txt, text/plain" id="importUserFilterInput" style="display: none;" type="file"/>
-                        <a class="button button--green button--link" href="#" i18n="options_userfilter_import" id="userFiltersImport"></a>
-                        <a class="button button--green-bd button--link disabled" href="#" i18n="options_userfilter_export" id="userFiltersExport"></a>
+                        <input type="file" id="importUserFilterInput" style="display: none;" accept=".txt, text/plain"/>
+                        <a id="userFiltersImport" href="#" i18n="options_userfilter_import" class="button button--green button--link"></a>
+                        <a id="userFiltersExport" href="#" i18n="options_userfilter_export" class="button button--green-bd button--link disabled"></a>
                     </div>
                 </div>
             </div>
