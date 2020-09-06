@@ -1,4 +1,5 @@
-const config = require('config');
+/* eslint-disable-next-line import/no-unresolved */
+const { requireTaskPool } = require('electron-remote');
 const listeners = require('../../notifier');
 const events = require('../../events');
 const settings = require('../settings-manager');
@@ -6,8 +7,7 @@ const antibanner = require('../antibanner');
 const whitelist = require('../whitelist');
 const log = require('../utils/log');
 const concurrent = require('../utils/concurrent');
-const {groupRules, rulesGroupsBundles, filterGroupsBundles} = require('./rule-groups');
-const {requireTaskPool} = require('electron-remote');
+const { groupRules, rulesGroupsBundles, filterGroupsBundles } = require('./rule-groups');
 
 /**
  * Safari Content Blocker Adapter
@@ -15,6 +15,7 @@ const {requireTaskPool} = require('electron-remote');
  * @type {{updateContentBlocker}}
  */
 module.exports = (function () {
+    const RULES_LIMIT = 50000;
     const DEBOUNCE_PERIOD = 500;
 
     /**
@@ -25,6 +26,8 @@ module.exports = (function () {
         loadRules(async rules => {
 
             const grouped = groupRules(rules);
+            let overlimit = false;
+
             for (let group of grouped) {
                 const rulesTexts = group.rules.map(x => x.ruleText);
                 const bundleId = rulesGroupsBundles[group.key];
@@ -34,7 +37,7 @@ module.exports = (function () {
                     bundleId: bundleId,
                     overlimit: false,
                     filterGroups: group.filterGroups,
-                    hasError: false
+                    hasError: false,
                 };
 
                 setSafariContentBlocker(bundleId, rulesTexts, info);
@@ -46,9 +49,11 @@ module.exports = (function () {
                 { rulesCount: rules.length }
             );
 
+            const rulesWithoutComments = rules.filter((rule) => !rule.ruleText.startsWith('!')).length;
+
             // TODO: This info is now ready only after content-blocker set
             listeners.notifyListeners(events.CONTENT_BLOCKER_UPDATED, {
-                rulesCount: rules.length,
+                rulesCount: rulesWithoutComments.length,
                 rulesOverLimit: false, // unknown
                 advancedBlockingRulesCount: rules.length // unknown
             });
@@ -61,7 +66,6 @@ module.exports = (function () {
      * @private
      */
     const loadRules = concurrent.debounce((callback) => {
-
         if (settings.isFilteringDisabled()) {
             log.info('Disabling content blocker.');
             callback(null);
@@ -74,20 +78,19 @@ module.exports = (function () {
 
         log.info('Rules loaded: {0}', rules.length);
         if (settings.isDefaultWhiteListMode()) {
-            rules = rules.concat(whitelist.getRules().map(r => {
-                return {filterId: 0, ruleText: r}
+            rules = rules.concat(whitelist.getRules().map((r) => {
+                return { filterId: 0, ruleText: r };
             }));
         } else {
             const invertedWhitelistRule = constructInvertedWhitelistRule();
             if (invertedWhitelistRule) {
                 rules = rules.concat({
-                    filterId: 0, ruleText: invertedWhitelistRule
+                    filterId: 0, ruleText: invertedWhitelistRule,
                 });
             }
         }
 
         callback(rules);
-
     }, DEBOUNCE_PERIOD);
 
     /**
@@ -106,10 +109,10 @@ module.exports = (function () {
             listeners.notifyListeners(events.CONTENT_BLOCKER_UPDATE_REQUIRED, {
                 bundleId,
                 json,
-                info
+                info,
             });
         } catch (ex) {
-            log.error(`Error while setting content blocker ${bundleId}: ` + ex);
+            log.error(`Error while setting content blocker ${bundleId}: ${ex}`);
         }
     };
 
@@ -122,15 +125,15 @@ module.exports = (function () {
         const domains = whitelist.getWhiteListDomains();
         let invertedWhitelistRule = '@@||*$document';
         if (domains && domains.length > 0) {
-            invertedWhitelistRule += ",domain=";
+            invertedWhitelistRule += ',domain=';
             let i = 0;
             const len = domains.length;
-            for (; i < len; i++) {
+            for (; i < len; i += 1) {
                 if (i > 0) {
                     invertedWhitelistRule += '|';
                 }
 
-                invertedWhitelistRule += '~' + domains[i];
+                invertedWhitelistRule += `~${domains[i]}`;
             }
         }
 
@@ -159,15 +162,15 @@ module.exports = (function () {
      */
     const getContentBlockersInfo = () => {
         const groupsBundles = filterGroupsBundles();
-        for (let extension of groupsBundles) {
-            extension.rulesInfo = contentBlockersInfoCache[extension.bundleId]
+        for (const extension of groupsBundles) {
+            extension.rulesInfo = contentBlockersInfoCache[extension.bundleId];
         }
 
         return groupsBundles;
     };
 
     // Subscribe to cb extensions update event
-    listeners.addListener(function (event, info) {
+    listeners.addListener((event, info) => {
         if (event === events.CONTENT_BLOCKER_EXTENSION_UPDATED) {
             if (info && info.bundleId) {
                 saveContentBlockerInfo(info.bundleId, info);
@@ -177,7 +180,7 @@ module.exports = (function () {
 
     return {
         updateContentBlocker,
-        getContentBlockersInfo
+        getContentBlockersInfo,
     };
 
 })();

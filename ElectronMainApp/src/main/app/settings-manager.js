@@ -1,18 +1,19 @@
+const safariToolbar = require('safari-ext');
 const localStorage = require('./storage/storage');
 const cache = require('./utils/cache');
 const log = require('./utils/log');
 const channels = require('./utils/channels');
 const listeners = require('../notifier');
 const events = require('../events');
-const safariToolbar = require('safari-ext');
 
 /**
  * Object that manages user settings.
  * @constructor
  */
 module.exports = (function () {
-
     'use strict';
+
+    const DEFAULT_FILTERS_UPDATE_PERIOD = -1;
 
     const settings = {
         DISABLE_SAFEBROWSING: 'safebrowsing-disabled',
@@ -25,7 +26,7 @@ module.exports = (function () {
         SHOW_TRAY_ICON: 'show-tray-icon',
         LAUNCH_AT_LOGIN: 'launch-at-login',
         VERBOSE_LOGGING: 'verbose-logging',
-        QUIT_ON_CLOSE_WINDOW: 'quit-on-close-main-window'
+        QUIT_ON_CLOSE_WINDOW: 'quit-on-close-main-window',
     };
 
     const properties = Object.create(null);
@@ -36,10 +37,10 @@ module.exports = (function () {
      */
     const defaultProperties = {
         get defaults() {
-            return cache.lazyGet(this, 'defaults', function () {
+            return cache.lazyGet(this, 'defaults', () => {
                 // Initialize default properties
                 const defaults = Object.create(null);
-                for (let name in settings) {
+                for (const name in settings) {
                     if (settings.hasOwnProperty(name)) {
                         defaults[settings[name]] = false;
                     }
@@ -58,7 +59,7 @@ module.exports = (function () {
 
                 return defaults;
             });
-        }
+        },
     };
 
     const getProperty = function (propertyName) {
@@ -92,10 +93,10 @@ module.exports = (function () {
     const getAllSettings = function () {
         const result = {
             names: Object.create(null),
-            values: Object.create(null)
+            values: Object.create(null),
         };
 
-        for (let key in settings) {
+        for (const key in settings) {
             if (settings.hasOwnProperty(key)) {
                 const setting = settings[key];
                 result.names[key] = setting;
@@ -123,8 +124,14 @@ module.exports = (function () {
         return !getProperty(settings.DISABLE_SHOW_APP_UPDATED_NOTIFICATION);
     };
 
-    const changeShowAppUpdatedNotification = function (show, options) {
-        setProperty(settings.DISABLE_SHOW_APP_UPDATED_NOTIFICATION, !show, options);
+    const changeShowAppUpdatedNotification = (value) => {
+        setProperty(settings.DISABLE_SHOW_APP_UPDATED_NOTIFICATION, value);
+
+        listeners.notifyListeners(events.SETTING_UPDATED, {
+            propertyName: settings.DISABLE_SHOW_APP_UPDATED_NOTIFICATION,
+            propertyValue: value,
+            inverted: true,
+        });
     };
 
     const changeEnableSafebrowsing = function (enabled) {
@@ -138,7 +145,7 @@ module.exports = (function () {
     const getSafebrowsingInfo = function () {
         return {
             enabled: !getProperty(settings.DISABLE_SAFEBROWSING),
-            sendStats: !getProperty(settings.DISABLE_SEND_SAFEBROWSING_STATS)
+            sendStats: !getProperty(settings.DISABLE_SEND_SAFEBROWSING_STATS),
         };
     };
 
@@ -150,8 +157,21 @@ module.exports = (function () {
         setProperty(settings.DEFAULT_WHITE_LIST_MODE, enabled);
     };
 
-    const changeUpdateFiltersPeriod = (value) => {
-        setProperty(settings.UPDATE_FILTERS_PERIOD, value);
+    const updateDefaultWhiteListMode = (value) => {
+        listeners.notifyListeners(events.SETTING_UPDATED, {
+            propertyName: settings.DEFAULT_WHITE_LIST_MODE,
+            propertyValue: value,
+            inverted: true,
+        });
+    };
+
+    const changeUpdateFiltersPeriod = (period) => {
+        let periodNum = Number.parseInt(period, 10);
+        if (Number.isNaN(periodNum)) {
+            periodNum = DEFAULT_FILTERS_UPDATE_PERIOD;
+        }
+        setProperty(settings.UPDATE_FILTERS_PERIOD, periodNum);
+        listeners.notifyListeners(events.FILTERS_PERIOD_UPDATED, periodNum);
     };
 
     const getUpdateFiltersPeriod = () => {
@@ -162,19 +182,58 @@ module.exports = (function () {
         setProperty(settings.LAUNCH_AT_LOGIN, value);
         safariToolbar.setStartAtLogin(value);
 
-        listeners.notifyListeners(events.LAUNCH_AT_LOGIN_UPDATED, value);
+        listeners.notifyListeners(events.SETTING_UPDATED, {
+            propertyName: settings.LAUNCH_AT_LOGIN,
+            propertyValue: value,
+            inverted: false,
+        });
     };
 
     const isLaunchAtLoginEnabled = () => {
         return getProperty(settings.LAUNCH_AT_LOGIN);
     };
 
+    const isShowTrayIconEnabled = () => {
+        return getProperty(settings.SHOW_TRAY_ICON);
+    };
+
+    const changeShowTrayIcon = (value) => {
+        setProperty(settings.SHOW_TRAY_ICON, value);
+
+        listeners.notifyListeners(events.SETTING_UPDATED, {
+            propertyName: settings.SHOW_TRAY_ICON,
+            propertyValue: value,
+            inverted: false,
+        });
+    };
+
     const isVerboseLoggingEnabled = function () {
         return getProperty(settings.VERBOSE_LOGGING);
     };
 
+    const changeVerboseLogging = (value) => {
+        setProperty(settings.VERBOSE_LOGGING, value);
+        safariToolbar.setVerboseLogging(value);
+
+        listeners.notifyListeners(events.SETTING_UPDATED, {
+            propertyName: settings.VERBOSE_LOGGING,
+            propertyValue: value,
+            inverted: false,
+        });
+    };
+
     const isHardwareAccelerationDisabled = function () {
         return getProperty(settings.DISABLE_HARDWARE_ACCELERATION);
+    };
+
+    const changeHardwareAcceleration = (value) => {
+        setProperty(settings.DISABLE_HARDWARE_ACCELERATION, value);
+
+        listeners.notifyListeners(events.SETTING_UPDATED, {
+            propertyName: settings.DISABLE_HARDWARE_ACCELERATION,
+            propertyValue: value,
+            inverted: true,
+        });
     };
 
     const isQuitOnCloseWindow = function () {
@@ -188,7 +247,7 @@ module.exports = (function () {
     const api = {};
 
     // Expose settings to api
-    for (let key in settings) {
+    for (const key in settings) {
         if (settings.hasOwnProperty(key)) {
             api[key] = settings[key];
         }
@@ -209,15 +268,19 @@ module.exports = (function () {
     api.getSafebrowsingInfo = getSafebrowsingInfo;
     api.isDefaultWhiteListMode = isDefaultWhiteListMode;
     api.changeDefaultWhiteListMode = changeDefaultWhiteListMode;
+    api.updateDefaultWhiteListMode = updateDefaultWhiteListMode;
     api.changeUpdateFiltersPeriod = changeUpdateFiltersPeriod;
     api.getUpdateFiltersPeriod = getUpdateFiltersPeriod;
     api.changeLaunchAtLogin = changeLaunchAtLogin;
     api.isLaunchAtLoginEnabled = isLaunchAtLoginEnabled;
+    api.isShowTrayIconEnabled = isShowTrayIconEnabled;
+    api.changeShowTrayIcon = changeShowTrayIcon;
     api.isVerboseLoggingEnabled = isVerboseLoggingEnabled;
+    api.changeVerboseLogging = changeVerboseLogging;
     api.isHardwareAccelerationDisabled = isHardwareAccelerationDisabled;
+    api.changeHardwareAcceleration = changeHardwareAcceleration;
     api.isQuitOnCloseWindow = isQuitOnCloseWindow;
     api.changeQuitOnCloseWindow = changeQuitOnCloseWindow;
 
     return api;
-
 })();
