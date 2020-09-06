@@ -72,11 +72,11 @@ static NSMutableDictionary<NSString *, AESListenerBlock> *ListenerHolder;
 static AESListenerBlock _onAllExtensionEnabledRequestBlock;
 
 + (void)initialize{
-    
+
     if (self == [AESharedResources class]) {
-        
+
         DDLogInfo(@"Initializing AESharedResources");
-        
+
         ListenerHolder = [NSMutableDictionary new];
         _containerFolderUrl = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:AG_GROUP];
         _sharedUserDefaults = [[NSUserDefaults alloc] initWithSuiteName:AG_GROUP];
@@ -85,7 +85,7 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
         NSDictionary * defs = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
         if (defs)
         [_sharedUserDefaults registerDefaults:defs];
-        
+
         DDLogInfo(@"Initializing AESharedResources - ok");
     }
 }
@@ -94,7 +94,7 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
 #pragma mark   Events (public methods)
 
 + (NSURL *)sharedResuorcesURL{
-    
+
     return _containerFolderUrl;
 }
 
@@ -162,7 +162,7 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
 
 + (void)requestAllExtensionEnabled {
     DDLogInfo(@"AG: requestAllExtensionEnabled");
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)REQUEST_EXTENSIONS_ENABLED, NULL, NULL, YES);
     });
@@ -173,7 +173,7 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
 }
 + (void)responseAllExtensionEnabled {
     DDLogInfo(@"AG: responseAllExtensionEnabled");
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)NOTIFICATION_EXTENSIONS_ENABLED, NULL, NULL, YES);
     });
@@ -278,13 +278,14 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
 #pragma mark Access to shared resources (public methods)
 
 + (void)setBlockingContentRulesJson:(NSData *)jsonData bundleId:(NSString *)bundleId completion:(void (^)(void))completion {
+    // TODO: Use swift-converter, jsonData is now an array of strings, here we should use swift-converter library to get content-blocker json
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         @autoreleasepool {
             DDLogInfo(@"AG: setBlockingContentRulesJson");
-            
+
             NSData *data = jsonData ?: [NSData data];
-            
+
             NSDictionary *d = @{
                                 AG_BLOCKER_BUNDLEID: AES_BLOCKING_CONTENT_RULES_RESOURCE,
                                 AG_BLOCKER_PRIVACY_BUNDLEID: AES_BLOCKING_CONTENT_RULES_PRIVACY_RESOURCE,
@@ -293,12 +294,12 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
                                 AG_BLOCKER_OTHER_BUNDLEID: AES_BLOCKING_CONTENT_RULES_OTHER_RESOURCE,
                                 AG_BLOCKER_CUSTOM_BUNDLEID: AES_BLOCKING_CONTENT_RULES_CUSTOM_RESOURCE
                                 };
-            
+
             NSString *path = d[bundleId];
             [self saveData:data toFileRelativePath:path];
-            
+
             DDLogInfo(@"AG: setBlockingContentRulesJson - ok");
-            
+
             if (completion) {
                 completion();
             }
@@ -307,14 +308,15 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
 }
 
 + (void)setAdvancedBlockingContentRulesJson:(NSData *)jsonData completion:(void (^)(void))completion {
+    // TODO: Use swift-converter, jsonData is now an array of strings, here we should use swift-converter library to get content-blocker json
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         @autoreleasepool {
             DDLogInfo(@"AG: setAdvancedBlockingContentRulesJson");
-            
+
             NSData *data = jsonData ?: [NSData data];
             [self saveData:data toFileRelativePath:AES_ADV_BLOCKING_CONTENT_RULES_RESOURCE];
-            
+
             DDLogInfo(@"AG: setAdvancedBlockingContentRulesJson - ok");
             if (completion) {
                 completion();
@@ -394,7 +396,7 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
 
 + (void)setListenerForNotification:(NSString *)notificationName
                              block:(AESListenerBlock)block {
-    
+
     AESListenerBlock prevBlock = ListenerHolder[notificationName];
     if (prevBlock) {
         //Observer was registered
@@ -424,30 +426,30 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
 
 
 + (NSData *)loadDataFromFileRelativePath:(NSString *)relativePath{
-    
+
     if (!relativePath) {
         [[NSException argumentException:@"relativePath"] raise];
     }
-    
+
     @autoreleasepool {
         if (_containerFolderUrl) {
-            
+
             NSURL *dataUrl = [_containerFolderUrl URLByAppendingPathComponent:relativePath];
             if (dataUrl) {
                 DDLogInfo(@"AG: loadDataFromFileRelativePath: %@", relativePath);
-                
+
                 ACLFileLocker *locker = [[ACLFileLocker alloc] initWithPath:[dataUrl path]];
                 if ([locker lock]) {
-                    
+
                     NSData *data = [NSData dataWithContentsOfURL:dataUrl];
-                    
+
                     [locker unlock];
-                    
+
                     return data;
                 }
             }
         }
-        
+
         return nil;
     }
 }
@@ -457,24 +459,24 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
     if (!(data && relativePath)) {
         [[NSException argumentException:@"data/relativePath"] raise];
     }
-    
+
     @autoreleasepool {
         if (_containerFolderUrl) {
-            
+
             NSURL *dataUrl = [_containerFolderUrl URLByAppendingPathComponent:relativePath];
             if (dataUrl) {
                 ACLFileLocker *locker = [[ACLFileLocker alloc] initWithPath:[dataUrl path]];
                 if ([locker lock]) {
-                    
+
                     BOOL result = [data writeToURL:dataUrl atomically:YES];
-                    
+
                     [locker unlock];
-                    
+
                     return result;
                 }
             }
         }
-        
+
         return NO;;
     }
 }
@@ -536,9 +538,9 @@ static AESListenerBlock _onAllExtensionEnabledRequestBlock;
 }
 
 - (NSString*) pathForRelativePath:(NSString*) relativePath {
-    
+
     NSURL *dataUrl = [_containerFolderUrl URLByAppendingPathComponent:relativePath];
-    
+
     return dataUrl.path;
 }
 

@@ -139,6 +139,8 @@ module.exports = (() => {
             log.info(`Content-blocker ${bundleId} set result : ${result}`);
 
             if (info) {
+                // TODO: Parse converted rules count and overlimit flag here
+
                 if (parseError(result)) {
                     info.hasError = true;
                 }

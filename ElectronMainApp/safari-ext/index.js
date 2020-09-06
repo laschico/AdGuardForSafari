@@ -85,7 +85,7 @@ module.exports = (() => {
      * {"result":"error", "error":{"domain":"ErrorDomain", "code":100, "descr":"Error Description IF Available"}}
      */
     const setContentBlockingJson = (bundleId, jsonString, callback) => {
-        if (bundleId === "com.adguard.safari.AdGuard.AdvancedBlocking") {
+        if (bundleId === ADVANCED_BLOCKING_BUNDLE_ID) {
             addon.setAdvancedBlockingJson(jsonString, callback);
         } else {
             addon.setContentBlockingJson(bundleId, jsonString, callback);

@@ -15,20 +15,7 @@ const {requireTaskPool} = require('electron-remote');
  * @type {{updateContentBlocker}}
  */
 module.exports = (function () {
-
-    const RULES_LIMIT = 50000;
     const DEBOUNCE_PERIOD = 500;
-
-    const emptyBlockerJSON = [
-        {
-            "action": {
-                "type": "ignore-previous-rules"
-            },
-            "trigger": {
-                "url-filter": "none"
-            }
-        }
-    ];
 
     /**
      * Load content blocker
@@ -38,68 +25,35 @@ module.exports = (function () {
         loadRules(async rules => {
 
             const grouped = groupRules(rules);
-            let overlimit = false;
-
             for (let group of grouped) {
-                let json = JSON.stringify(emptyBlockerJSON);
-
                 const rulesTexts = group.rules.map(x => x.ruleText);
-                const result = await jsonFromRules(rulesTexts, false);
-                if (result && result.converted) {
-                    json = result.converted;
-                    if (result.overLimit) {
-                        overlimit = true;
-                    }
-                }
+                const bundleId = rulesGroupsBundles[group.key];
 
                 const info = {
-                    rulesCount: result ? result.totalConvertedCount : 0,
-                    bundleId: rulesGroupsBundles[group.key],
-                    overlimit: result && result.overLimit,
+                    rulesCount: rulesTexts.length,
+                    bundleId: bundleId,
+                    overlimit: false,
                     filterGroups: group.filterGroups,
                     hasError: false
                 };
 
-                setSafariContentBlocker(rulesGroupsBundles[group.key], json, info);
+                setSafariContentBlocker(bundleId, rulesTexts, info);
             }
 
-            const advancedBlockingRulesCount = await setAdvancedBlocking(rules.map(x => x.ruleText));
+            setSafariContentBlocker(
+                rulesGroupsBundles["advancedBlocking"],
+                rules.map(x => x.ruleText),
+                { rulesCount: rules.length }
+            );
 
+            // TODO: This info is now ready only after content-blocker set
             listeners.notifyListeners(events.CONTENT_BLOCKER_UPDATED, {
                 rulesCount: rules.length,
-                rulesOverLimit: overlimit,
-                advancedBlockingRulesCount: advancedBlockingRulesCount
+                rulesOverLimit: false, // unknown
+                advancedBlockingRulesCount: rules.length // unknown
             });
 
         });
-    };
-
-    /**
-     * Runs converter method for rules
-     *
-     * @param rules array of rules
-     * @param advancedBlocking if we need advanced blocking content
-     */
-    const jsonFromRules = async (rules, advancedBlocking) => {
-        const converterModule = requireTaskPool(require.resolve('../libs/JSConverter'));
-
-        const result = await converterModule.jsonFromFilters(rules, RULES_LIMIT, false, advancedBlocking);
-        return result;
-    };
-
-    /**
-     * Activates advanced blocking json
-     *
-     * @param rules array of rules
-     * @return {int} rules count
-     */
-    const setAdvancedBlocking = async (rules) => {
-        const result = await jsonFromRules(rules, true);
-        const advancedBlocking = result ? result.advancedBlocking : "[]";
-
-        setSafariContentBlocker(rulesGroupsBundles["advancedBlocking"], advancedBlocking, {rulesCount: result ? result.totalConvertedCount : 0});
-
-        return result ? result.advancedBlockingConvertedCount : 0;
     };
 
     /**
@@ -137,15 +91,17 @@ module.exports = (function () {
     }, DEBOUNCE_PERIOD);
 
     /**
-     * Activates json for bundle
+     * Sets up rules for bundle
      *
      * @param bundleId
-     * @param json
+     * @param rulesTexts
      * @param info
      */
-    const setSafariContentBlocker = (bundleId, json, info) => {
+    const setSafariContentBlocker = (bundleId, rulesTexts, info) => {
         try {
-            log.info(`Setting content blocker json for ${bundleId}. Rules count: ${info.rulesCount}. Json length=${json.length};`);
+            log.info(`Setting content blocker json for ${bundleId}. Rules count: ${rulesTexts.length}.`);
+
+            const json = JSON.stringify(rulesTexts);
 
             listeners.notifyListeners(events.CONTENT_BLOCKER_UPDATE_REQUIRED, {
                 bundleId,
