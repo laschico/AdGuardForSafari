@@ -3,13 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		65024EA92126C80D00342E3C /* AdGuardTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 65024EA82126C80D00342E3C /* AdGuardTests.m */; };
 		65024EAF2126C82E00342E3C /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65024EAE2126C82E00342E3C /* SafariServices.framework */; };
 		6504C1102136EA2D007E9674 /* PopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6504C10F2136EA2D007E9674 /* PopupView.m */; };
+		6519C8A2250780D700CB6413 /* ContentBlockerConverter in Frameworks */ = {isa = PBXBuildFile; productRef = 6519C8A1250780D700CB6413 /* ContentBlockerConverter */; };
 		651A4FAE232149E4002DAD0A /* AEMainAppServices.h in Headers */ = {isa = PBXBuildFile; fileRef = 651A4FAC232149E4002DAD0A /* AEMainAppServices.h */; };
 		651A4FAF232149E4002DAD0A /* AEMainAppServices.m in Sources */ = {isa = PBXBuildFile; fileRef = 651A4FAD232149E4002DAD0A /* AEMainAppServices.m */; };
 		651D5DA523673D430025C72C /* AdGuard Login Helper.app in Copy Launch At Login Helper */ = {isa = PBXBuildFile; fileRef = 65EF979D23672E15000CC845 /* AdGuard Login Helper.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -755,6 +756,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6519C8A2250780D700CB6413 /* ContentBlockerConverter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1279,6 +1281,9 @@
 			dependencies = (
 			);
 			name = shared;
+			packageProductDependencies = (
+				6519C8A1250780D700CB6413 /* ContentBlockerConverter */,
+			);
 			productName = shared;
 			productReference = 652735B2212D77A3005C35BF /* libshared.a */;
 			productType = "com.apple.product-type.library.static";
@@ -1625,6 +1630,9 @@
 				"sr-Latn",
 			);
 			mainGroup = 65720AA921219AC900B2381C;
+			packageReferences = (
+				6519C8A0250780D700CB6413 /* XCRemoteSwiftPackageReference "safari-converter" */,
+			);
 			productRefGroup = 65720AB321219AC900B2381C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -3987,6 +3995,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6519C8A0250780D700CB6413 /* XCRemoteSwiftPackageReference "safari-converter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://bit.adguard.com/scm/adguard-ios/safari-converter.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6519C8A1250780D700CB6413 /* ContentBlockerConverter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6519C8A0250780D700CB6413 /* XCRemoteSwiftPackageReference "safari-converter" */;
+			productName = ContentBlockerConverter;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 65720AAA21219AC900B2381C /* Project object */;
 }
