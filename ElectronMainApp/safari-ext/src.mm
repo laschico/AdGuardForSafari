@@ -3,6 +3,7 @@
 #import "shared/AESharedResources.h"
 #import "shared/AEMainAppServices.h"
 #import "shared/CommonLib/ACLang.h"
+#import "shared/sharedSwift/sharedSwift.h"
 #include <nan.h>
 
 
@@ -235,6 +236,45 @@ NAN_METHOD(setContentBlockingJson) {
 			uv_async_send(async);
 		}
       }];
+    }];
+}
+
+NAN_METHOD(setAdvancedBlockingJsonNew) {
+    
+    if (info.Length() < 2) {
+        ThrowTypeError("Wrong number of arguments");
+        return;
+    }
+    
+    if (!info[0]->IsString() || !info[1]->IsFunction()) {
+        ThrowTypeError("Wrong arguments");
+        return;
+    }
+    NSData *data = [NSData new];
+    Nan::Utf8String msg (info[0]);
+    if (msg.length() > 0) {
+        data = [NSData dataWithBytes:*msg length:msg.length()];
+    }
+    
+    Nan::Callback *cb = new Nan::Callback(info[1].As<Function>());
+    
+    SwiftContentBlockerConverter *converter = [SwiftContentBlockerConverter new];
+    
+    [AESharedResources setAdvancedBlockingContentRulesJson:data completion:^{
+        DDLogCDebug(@"Json updated in file. Notify the advanced blocking extension.");
+        [AESharedResources notifyAdvancedBlockingExtension];
+
+        NSString *jsonResult = @"{\"result\":\"success\"}";
+
+        auto *info = new CallbackInfo();
+        info->type = CallbackTypeForBlockingContentRules;
+        info->result = (void *)CFBridgingRetain(jsonResult);
+        info->callback = cb;
+
+        auto *async = new uv_async_t();
+        async->data = info;
+        uv_async_init(uv_default_loop(), async, (uv_async_cb)AsyncSendHandler);
+        uv_async_send(async);
     }];
 }
 

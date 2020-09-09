@@ -7,7 +7,8 @@
        "<!(node -e \"require('nan')\")",
      ],
      "libraries": [
-        "../shared/libshared.a"
+        "../shared/libshared.a",
+        "../shared/libsharedSwift.a"
       ],
      "xcode_settings": {
        "OTHER_CPLUSPLUSFLAGS": ["-std=c++11", "-stdlib=libc++", "-mmacosx-version-min=10.12"],

@@ -39,6 +39,7 @@ cd "${SRC}/safari-ext"
 
 mkdir -vp "${SRC}/safari-ext/shared"
 cp -v "${BUILT_PRODUCTS_DIR}/libshared.a" "${SRC}/safari-ext/shared/" || exit 1
+cp -v "${BUILT_PRODUCTS_DIR}/libsharedSwift.a" "${SRC}/safari-ext/shared/" || exit 1
 rsync -avm --include='*.h' -f 'hide,! */' "${SHAREDSRC}/" "${SRC}/safari-ext/shared/"
 
 # Update package.json
