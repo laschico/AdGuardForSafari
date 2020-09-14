@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -124,6 +124,7 @@
 		F46D1322225E940B00282566 /* standalone.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = F46D1321225E940B00282566 /* standalone.xcconfig */; };
 		F46D132D225E946500282566 /* standalone-beta.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = F46D132C225E946500282566 /* standalone-beta.xcconfig */; };
 		F4757500222FF92200DE28C3 /* adv-blocking-content-rules.json in Resources */ = {isa = PBXBuildFile; fileRef = F47574FF222FF92200DE28C3 /* adv-blocking-content-rules.json */; };
+		F479F068250FB9A100AE080A /* ContentBlockerConverter in Frameworks */ = {isa = PBXBuildFile; productRef = F479F067250FB9A100AE080A /* ContentBlockerConverter */; };
 		F49E3FE6221F4D72001B9E86 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F49E3FE8221F4D72001B9E86 /* InfoPlist.strings */; };
 		F4B2150622EA298300E2EA16 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65216A02212436EA00ABF7D0 /* Cocoa.framework */; };
 		F4B2150C22EA298300E2EA16 /* ContentBlockerRequestHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = F4B2150B22EA298300E2EA16 /* ContentBlockerRequestHandler.m */; };
@@ -755,6 +756,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F479F068250FB9A100AE080A /* ContentBlockerConverter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1279,6 +1281,9 @@
 			dependencies = (
 			);
 			name = shared;
+			packageProductDependencies = (
+				F479F067250FB9A100AE080A /* ContentBlockerConverter */,
+			);
 			productName = shared;
 			productReference = 652735B2212D77A3005C35BF /* libshared.a */;
 			productType = "com.apple.product-type.library.static";
@@ -1625,6 +1630,9 @@
 				"sr-Latn",
 			);
 			mainGroup = 65720AA921219AC900B2381C;
+			packageReferences = (
+				F479F066250FB9A100AE080A /* XCRemoteSwiftPackageReference "safari-converter" */,
+			);
 			productRefGroup = 65720AB321219AC900B2381C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -3987,6 +3995,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F479F066250FB9A100AE080A /* XCRemoteSwiftPackageReference "safari-converter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://bit.adguard.com/scm/adguard-ios/safari-converter.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F479F067250FB9A100AE080A /* ContentBlockerConverter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F479F066250FB9A100AE080A /* XCRemoteSwiftPackageReference "safari-converter" */;
+			productName = ContentBlockerConverter;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 65720AAA21219AC900B2381C /* Project object */;
 }
