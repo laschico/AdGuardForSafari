@@ -434,6 +434,8 @@ NAN_METHOD(getExtensionContentBlockerState){
 
     [SFContentBlockerManager getStateOfContentBlockerWithIdentifier:bundleId
     completionHandler:^(SFContentBlockerState * _Nullable state, NSError * _Nullable error) {
+        NSLog(@"getExtensionContentBlockerState state: %@", state);
+        NSLog(@"getExtensionContentBlockerState error: %@", error);
         resultBlock(error == nil && state.enabled);
     }];
 }
