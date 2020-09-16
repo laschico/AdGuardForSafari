@@ -37,7 +37,7 @@
 Ad blocking extensions for Safari are having hard time since Apple [started to force everyone](https://adguard.com/en/blog/safari-adblock-extensions/) to use the new SDK. AdGuard extension is supposed to bring back the high quality ad blocking back to Safari.
 
 ### IMPORTANT: 
-##### *Please note that you have to move `AdGuard for Safari.app` in `Applications` directory before launch*
+##### *If you want to use a standalone build of AdGuard (beta or stable), it must be launched from the `Applications` directory.*
 
 Unlike other major ad blockers, AdGuard provides some extra features you are used to have with the traditional (now deprecated) extensions:
 
