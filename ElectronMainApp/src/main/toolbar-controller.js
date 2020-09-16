@@ -136,6 +136,7 @@ module.exports = (() => {
         log.debug(`Content-blocker updating ${bundleId}`);
         safariToolbar.setContentBlockingJson(bundleId, jsonString, (result) => {
             log.info(`Content-blocker ${bundleId} set result : ${result}`);
+            log.info(`Info: ${JSON.stringify(info, null, 4)}`);
 
             if (info) {
                 if (parseError(result)) {
