@@ -6,7 +6,7 @@ echo "AG_STANDALONE: ${AG_STANDALONE}"
 echo "AG_STANDALONE_BETA: ${AG_STANDALONE_BETA}"
 
 # Fix nvm incompatibility
-. ~/.nvm/nvm.sh
+source $(brew --prefix nvm)/nvm.sh
 nvm use v13.10.0 || exit 1
 
 PLATFORM=mas
